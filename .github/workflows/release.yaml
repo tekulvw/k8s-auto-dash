@@ -22,7 +22,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Resolve icons commit
         id: icons
-        run: echo "sha=$(curl -fsS https://api.github.com/repos/homarr-labs/dashboard-icons/commits/main | jq -r .sha)" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "sha=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/homarr-labs/dashboard-icons/commits/main | jq -r .sha)" >> $GITHUB_OUTPUT
       - name: Build & push image
         uses: docker/build-push-action@v6
         with:
