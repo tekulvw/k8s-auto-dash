@@ -12,7 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"icons:fetch": "node scripts/fetch-icons.mjs",
 		"icons:list": "node scripts/generate-icon-list.mjs",
-		"icons": "pnpm icons:fetch && pnpm icons:list"
+		"icons": "pnpm icons:fetch && pnpm icons:list",
+		"test:e2e": "playwright test"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.60.0",
