@@ -80,6 +80,16 @@
     addBookmarkGroup = null;
     await tiles.load();
   }
+
+  async function onReorder(detail: { group: string; items: import('$lib/api/types').Tile[] }) {
+    const overrides = detail.items.map((t, i) => ({
+      id: t.id,
+      order: i,
+      group: detail.group,
+    }));
+    await api.patchConfig({ tiles: overrides });
+    await tiles.load();
+  }
 </script>
 
 <Header title="Dashboard" />
@@ -93,6 +103,7 @@
       on:editTile={(e) => (editingTileId = e.detail.id)}
       on:hideTile={(e) => onHideTile(e.detail)}
       on:addBookmark={(e) => (addBookmarkGroup = e.detail.group)}
+      on:reorder={(e) => onReorder(e.detail)}
     />
   {/each}
 

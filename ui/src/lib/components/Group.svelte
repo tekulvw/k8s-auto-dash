@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Tile from './Tile.svelte';
+  import { dndzone, type DndEvent } from 'svelte-dnd-action';
   import type { Group, Tile as TTile } from '$lib/api/types';
 
   export let group: Group;
@@ -11,9 +12,21 @@
     editTile: { id: string };
     hideTile: { id: string };
     addBookmark: { group: string };
+    reorder: { group: string; items: TTile[] };
   }>();
 
+  const flipDurationMs = 150;
+
+  function consider(e: CustomEvent<DndEvent<TTile>>) {
+    sorted = e.detail.items;
+  }
+  function finalize(e: CustomEvent<DndEvent<TTile>>) {
+    sorted = e.detail.items;
+    dispatch('reorder', { group: group.id, items: sorted });
+  }
+
   $: visible = editing ? tiles : tiles.filter((t) => !t.hidden);
+  let sorted: TTile[] = [];
   $: sorted = [...visible].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 </script>
 
@@ -27,7 +40,12 @@
     {/if}
   </header>
 
-  <div class="grid">
+  <div
+    class="grid"
+    use:dndzone={{ items: sorted, flipDurationMs, dragDisabled: !editing, type: 'tile' }}
+    on:consider={consider}
+    on:finalize={finalize}
+  >
     {#each sorted as t (t.id)}
       <Tile
         tile={t}
