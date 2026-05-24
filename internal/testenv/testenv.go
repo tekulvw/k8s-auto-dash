@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
 	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -45,6 +46,7 @@ func Start(t *testing.T) *Env {
 	scheme := k8sruntime.NewScheme()
 	require.NoError(t, v1.AddToScheme(scheme))
 	require.NoError(t, gwv1.Install(scheme))
+	require.NoError(t, corev1.AddToScheme(scheme))
 
 	c, err := client.New(cfg, client.Options{Scheme: scheme})
 	require.NoError(t, err)
