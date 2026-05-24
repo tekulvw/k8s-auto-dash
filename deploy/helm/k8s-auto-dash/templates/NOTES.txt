@@ -13,3 +13,7 @@ set `httpRoute.enabled: true` in values.yaml.
 The controller will auto-create a DashboardConfig named "default" if
 one does not exist:
   kubectl get dashboardconfig default -o yaml
+
+{{- if not .Values.crd.install }}
+NOTE: To skip CRD installation, pass --skip-crds to `helm install`.
+{{- end }}

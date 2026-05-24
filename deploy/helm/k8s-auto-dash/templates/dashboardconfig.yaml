@@ -1,0 +1,12 @@
+{{- if .Values.config }}
+{{- if not (empty .Values.config) }}
+apiVersion: k8s-auto-dash.io/v1alpha1
+kind: DashboardConfig
+metadata:
+  name: default
+  labels:
+    {{- include "k8s-auto-dash.labels" . | nindent 4 }}
+spec:
+  {{- toYaml .Values.config | nindent 2 }}
+{{- end }}
+{{- end }}

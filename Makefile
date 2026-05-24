@@ -54,3 +54,16 @@ image:
 .PHONY: image-push
 image-push:
 	$(_BUILDX_COMMON) --platform $(PLATFORMS) --push .
+
+.PHONY: chart-sync
+chart-sync: generate
+	cp deploy/crd/k8s-auto-dash.io_dashboardconfigs.yaml \
+	   deploy/helm/k8s-auto-dash/crds/dashboardconfig.yaml
+
+.PHONY: chart-lint
+chart-lint: chart-sync
+	helm lint deploy/helm/k8s-auto-dash
+
+.PHONY: chart-template
+chart-template: chart-sync
+	helm template test deploy/helm/k8s-auto-dash
