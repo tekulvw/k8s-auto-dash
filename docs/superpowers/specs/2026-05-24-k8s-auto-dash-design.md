@@ -1,4 +1,4 @@
-# gateway-dash — Design
+# k8s-auto-dash — Design
 
 Status: Approved (brainstorming)
 Date: 2026-05-24
@@ -9,8 +9,8 @@ hostname, and lets the user manually curate layout, naming, icons, and
 visibility — with all customization persisted to a single CRD in the
 cluster.
 
-The name `gateway-dash` is a working title; the user may rename before
-implementation.
+Working name: `k8s-auto-dash`. Binary, image, Helm chart, and CRD API
+group all use this slug.
 
 ## Goals
 
@@ -52,7 +52,7 @@ one replica.
 
 ```
                   ┌────────────────────────────────────────────┐
-                  │  gateway-dash pod                          │
+                  │  k8s-auto-dash pod                          │
                   │                                            │
   k8s API ─watch──┤  Discoverer  ──►  in-memory route cache    │
                   │                       │                    │
@@ -85,7 +85,7 @@ that periodically probes every discovered hostname. Default interval
 60 s with ±10% jitter. Uses `HEAD` first; on 405/501 retries once with
 `GET`. Timeout default 5 s. TLS verified by default; a global
 `insecureSkipVerify` flag plus per-tile override allows self-signed
-setups. Identifies itself with `User-Agent: gateway-dash/<version>
+setups. Identifies itself with `User-Agent: k8s-auto-dash/<version>
 (health-check)`. Hidden tiles are still probed so toggling visibility
 is cheap.
 
@@ -112,13 +112,13 @@ error to the client.
 
 ## Data Model
 
-### CRD: `DashboardConfig` (cluster-scoped, group `gateway-dash.io/v1alpha1`)
+### CRD: `DashboardConfig` (cluster-scoped, group `k8s-auto-dash.io/v1alpha1`)
 
 The controller reads exactly one instance, named `default`. If absent
 on startup, it is created empty.
 
 ```yaml
-apiVersion: gateway-dash.io/v1alpha1
+apiVersion: k8s-auto-dash.io/v1alpha1
 kind: DashboardConfig
 metadata:
   name: default
@@ -347,16 +347,16 @@ Side panel triggered by `⋯ → Edit`. Fields:
 - Multi-stage Dockerfile producing a single static binary in a
   `distroless/static` (or `scratch`) final image, ~25–30 MB.
 - Built for `linux/amd64` and `linux/arm64`.
-- Published to GHCR as `ghcr.io/<owner>/gateway-dash:vX.Y.Z` and
+- Published to GHCR as `ghcr.io/<owner>/k8s-auto-dash:vX.Y.Z` and
   `:latest`.
 
 ### Helm chart
 
-Located at `deploy/helm/gateway-dash/`. Representative values:
+Located at `deploy/helm/k8s-auto-dash/`. Representative values:
 
 ```yaml
 image:
-  repository: ghcr.io/<owner>/gateway-dash
+  repository: ghcr.io/<owner>/k8s-auto-dash
   tag: ""                  # defaults to chart appVersion
 serviceAccount:
   create: true
@@ -392,10 +392,10 @@ ClusterRole (read-only, cluster-wide):
     verbs: ["get","list","watch"]
 
 ClusterRole (own CR):
-  - apiGroups: ["gateway-dash.io"]
+  - apiGroups: ["k8s-auto-dash.io"]
     resources: ["dashboardconfigs"]
     verbs: ["get","list","watch","update","patch","create"]
-  - apiGroups: ["gateway-dash.io"]
+  - apiGroups: ["k8s-auto-dash.io"]
     resources: ["dashboardconfigs/status"]
     verbs: ["get","update","patch"]
 ```
@@ -429,7 +429,7 @@ creates an empty one. Idempotent.
 
 ```
 .
-├── cmd/gateway-dash/         # main()
+├── cmd/k8s-auto-dash/         # main()
 ├── internal/
 │   ├── discoverer/           # informers + tile derivation
 │   ├── health/               # probe worker pool
@@ -440,19 +440,23 @@ creates an empty one. Idempotent.
 ├── ui/                       # SvelteKit static build source
 ├── ui/build/                 # embed.FS target (gitignored)
 ├── deploy/
-│   ├── helm/gateway-dash/
+│   ├── helm/k8s-auto-dash/
 │   └── manifests/install.yaml
 ├── docs/
 └── Dockerfile
 ```
 
-## Open Questions
+## Icons
 
-- Final name. `gateway-dash` is a placeholder.
-- Icon source: bundled snapshot of `selfhst/dashboard-icons`
-  (predictable, offline-friendly, larger image) vs. fetched at
-  runtime from a CDN (smaller image, requires egress). Default
-  proposal: bundled.
+A snapshot of [`selfhst/dashboard-icons`](https://github.com/selfhst/dashboard-icons)
+is bundled into the binary via `embed.FS`. Predictable, offline-friendly,
+no runtime egress required. The build pipeline pins a specific commit
+of the icons repo and vendors it under `ui/icons/` before the Go build.
+Image size impact (~20–40 MB of SVG/PNG depending on which subset we
+ship) is acceptable for a homelab tool.
+
+A "custom URL" option in the tile editor lets users point at any
+external image if a service isn't in the bundled set.
 
 ## Roadmap Beyond v1
 
