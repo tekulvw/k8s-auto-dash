@@ -57,7 +57,7 @@ affinity: {}
 # Optional HTTPRoute publishing the dashboard onto your own gateway.
 httpRoute:
   enabled: false
-  hostname: ""
+  hostname: "dash.example.com"
   parentRef:
     name: ""
     namespace: ""

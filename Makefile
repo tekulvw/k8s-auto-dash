@@ -42,21 +42,15 @@ IMAGE         ?= ghcr.io/anomalyco/k8s-auto-dash
 TAG           ?= dev
 PLATFORMS     ?= linux/amd64,linux/arm64
 
-.PHONY: image
-image:
-	docker buildx build \
-	  --platform $(PLATFORMS) \
+_BUILDX_COMMON = docker buildx build \
 	  --build-arg ICONS_COMMIT=$(ICONS_COMMIT) \
 	  --build-arg VERSION=$(TAG) \
-	  -t $(IMAGE):$(TAG) \
-	  .
+	  -t $(IMAGE):$(TAG)
+
+.PHONY: image
+image:
+	$(_BUILDX_COMMON) --load .
 
 .PHONY: image-push
 image-push:
-	docker buildx build \
-	  --platform $(PLATFORMS) \
-	  --build-arg ICONS_COMMIT=$(ICONS_COMMIT) \
-	  --build-arg VERSION=$(TAG) \
-	  -t $(IMAGE):$(TAG) \
-	  --push \
-	  .
+	$(_BUILDX_COMMON) --platform $(PLATFORMS) --push .
