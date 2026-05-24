@@ -37,3 +37,26 @@ build:
 .PHONY: tidy
 tidy:
 	$(GO) mod tidy
+
+IMAGE         ?= ghcr.io/anomalyco/k8s-auto-dash
+TAG           ?= dev
+PLATFORMS     ?= linux/amd64,linux/arm64
+
+.PHONY: image
+image:
+	docker buildx build \
+	  --platform $(PLATFORMS) \
+	  --build-arg ICONS_COMMIT=$(ICONS_COMMIT) \
+	  --build-arg VERSION=$(TAG) \
+	  -t $(IMAGE):$(TAG) \
+	  .
+
+.PHONY: image-push
+image-push:
+	docker buildx build \
+	  --platform $(PLATFORMS) \
+	  --build-arg ICONS_COMMIT=$(ICONS_COMMIT) \
+	  --build-arg VERSION=$(TAG) \
+	  -t $(IMAGE):$(TAG) \
+	  --push \
+	  .
