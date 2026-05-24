@@ -52,3 +52,27 @@ func (s *Store) Get(ctx context.Context) (*v1.DashboardConfig, error) {
 	}
 	return cfg, nil
 }
+
+// Mutate applies mutateFn to a fresh copy of spec and writes it back.
+// Retries up to maxRetries times on Conflict errors (optimistic
+// concurrency).
+func (s *Store) Mutate(ctx context.Context, mutateFn func(*v1.DashboardConfigSpec) error) error {
+	const maxRetries = 5
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		cfg, err := s.Get(ctx)
+		if err != nil {
+			return err
+		}
+		if err := mutateFn(&cfg.Spec); err != nil {
+			return err
+		}
+		if err := s.c.Update(ctx, cfg); err != nil {
+			if apierrors.IsConflict(err) {
+				continue
+			}
+			return err
+		}
+		return nil
+	}
+	return errors.New("config update conflict after retries")
+}
