@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type Options struct {

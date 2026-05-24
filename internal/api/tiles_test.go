@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func TestHandleTiles_ReturnsJSON(t *testing.T) {

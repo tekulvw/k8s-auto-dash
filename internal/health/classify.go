@@ -1,6 +1,6 @@
 package health
 
-import "github.com/anomalyco/k8s-auto-dash/internal/tile"
+import "github.com/tekulvw/k8s-auto-dash/internal/tile"
 
 // Classify maps an HTTP response (or network error) to a tile state.
 //

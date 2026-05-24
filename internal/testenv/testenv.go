@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 type Env struct {

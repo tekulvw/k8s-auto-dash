@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 func (s *Server) requireMutator(w http.ResponseWriter) bool {

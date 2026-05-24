@@ -13,10 +13,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/api"
-	configstore "github.com/anomalyco/k8s-auto-dash/internal/config"
-	"github.com/anomalyco/k8s-auto-dash/internal/discovery"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	"github.com/tekulvw/k8s-auto-dash/internal/api"
+	configstore "github.com/tekulvw/k8s-auto-dash/internal/config"
+	"github.com/tekulvw/k8s-auto-dash/internal/discovery"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestE2E_DiscoveryToAPI(t *testing.T) {

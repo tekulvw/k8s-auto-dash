@@ -3,7 +3,7 @@ package tile
 import (
 	"sort"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 // ApplyOverrides returns a copy of derived with overrides applied.

@@ -6,9 +6,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/assets"
-	"github.com/anomalyco/k8s-auto-dash/internal/metrics"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/assets"
+	"github.com/tekulvw/k8s-auto-dash/internal/metrics"
 )
 
 type ConfigMutator interface {

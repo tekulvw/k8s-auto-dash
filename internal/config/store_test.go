@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestStore_BootstrapCreatesDefault(t *testing.T) {

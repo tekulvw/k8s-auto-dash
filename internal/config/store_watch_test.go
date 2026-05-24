@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestStore_WatchEmitsOnChange(t *testing.T) {

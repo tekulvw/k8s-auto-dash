@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 	"github.com/stretchr/testify/assert"
 )
 

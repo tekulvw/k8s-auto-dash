@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type recorder struct {

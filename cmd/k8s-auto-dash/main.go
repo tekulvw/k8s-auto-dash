@@ -15,13 +15,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/api"
-	configstore "github.com/anomalyco/k8s-auto-dash/internal/config"
-	"github.com/anomalyco/k8s-auto-dash/internal/discovery"
-	"github.com/anomalyco/k8s-auto-dash/internal/health"
-	"github.com/anomalyco/k8s-auto-dash/internal/metrics"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/api"
+	configstore "github.com/tekulvw/k8s-auto-dash/internal/config"
+	"github.com/tekulvw/k8s-auto-dash/internal/discovery"
+	"github.com/tekulvw/k8s-auto-dash/internal/health"
+	"github.com/tekulvw/k8s-auto-dash/internal/metrics"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 var version = "dev"

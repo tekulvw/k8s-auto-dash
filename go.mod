@@ -1,4 +1,4 @@
-module github.com/anomalyco/k8s-auto-dash
+module github.com/tekulvw/k8s-auto-dash
 
 go 1.26.2
 

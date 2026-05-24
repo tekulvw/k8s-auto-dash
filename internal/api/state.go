@@ -4,8 +4,8 @@ import (
 	"sort"
 	"sync"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 // ViewTile is the wire shape returned from /api/tiles. It mirrors
