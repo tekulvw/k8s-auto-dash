@@ -1,0 +1,15 @@
+.git
+.github
+docs
+**/node_modules
+**/.svelte-kit
+ui/build
+ui/icons
+internal/assets/ui/*
+internal/assets/icons/*
+!internal/assets/ui/.gitkeep
+!internal/assets/icons/.gitkeep
+bin
+*.test
+coverage.out
+.superpowers
