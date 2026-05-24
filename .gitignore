@@ -3,3 +3,9 @@ bin/
 /k8s-auto-dash
 *.test
 coverage.out
+
+# Embedded build output (generated, not source)
+internal/assets/ui/*
+internal/assets/icons/*
+!internal/assets/ui/.gitkeep
+!internal/assets/icons/.gitkeep

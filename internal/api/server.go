@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	"github.com/anomalyco/k8s-auto-dash/internal/assets"
 	"github.com/anomalyco/k8s-auto-dash/internal/metrics"
 )
 
@@ -50,4 +51,7 @@ func (s *Server) routes() {
 	if s.metrics != nil {
 		s.mux.Handle("GET /metrics", promhttp.HandlerFor(s.metrics.Registry, promhttp.HandlerOpts{}))
 	}
+	s.mux.Handle("/icons/", assets.IconsHandler())
+	// Catch-all: serve the UI SPA.
+	s.mux.Handle("/", assets.UIHandler())
 }
