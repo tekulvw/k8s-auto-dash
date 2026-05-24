@@ -4,7 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	"github.com/anomalyco/k8s-auto-dash/internal/metrics"
 )
 
 type ConfigMutator interface {
@@ -15,19 +18,20 @@ type Server struct {
 	state   *State
 	mutator ConfigMutator
 	bus     *Bus
+	metrics *metrics.Registry
 	mux     *http.ServeMux
 }
 
 func NewServer(state *State) *Server {
-	return NewServerFull(state, nil, nil)
+	return NewServerFull(state, nil, nil, nil)
 }
 
 func NewServerWith(state *State, m ConfigMutator) *Server {
-	return NewServerFull(state, m, nil)
+	return NewServerFull(state, m, nil, nil)
 }
 
-func NewServerFull(state *State, m ConfigMutator, b *Bus) *Server {
-	s := &Server{state: state, mutator: m, bus: b, mux: http.NewServeMux()}
+func NewServerFull(state *State, m ConfigMutator, b *Bus, mr *metrics.Registry) *Server {
+	s := &Server{state: state, mutator: m, bus: b, metrics: mr, mux: http.NewServeMux()}
 	s.routes()
 	return s
 }
@@ -43,4 +47,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("DELETE /api/config/bookmarks/{id}", s.handleDeleteBookmark)
 	s.mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(200) })
 	s.mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(200) })
+	if s.metrics != nil {
+		s.mux.Handle("GET /metrics", promhttp.HandlerFor(s.metrics.Registry, promhttp.HandlerOpts{}))
+	}
 }
