@@ -62,11 +62,18 @@ jobs:
       - run: helm template test deploy/helm/k8s-auto-dash > /dev/null
 
   image:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     needs: [go, ui, helm]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v6
-      - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
       - name: Resolve icons commit
         id: icons
@@ -75,8 +82,9 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           push: false
+          load: true
           build-args: |
             ICONS_COMMIT=${{ steps.icons.outputs.sha }}
             VERSION=ci
