@@ -1,0 +1,15 @@
+{{ include "k8s-auto-dash.fullname" . }} has been installed.
+
+The dashboard is available inside the cluster at:
+  http://{{ include "k8s-auto-dash.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+
+{{- if .Values.httpRoute.enabled }}
+External URL (via your Gateway): https://{{ .Values.httpRoute.hostname }}
+{{- else }}
+Expose it by creating an HTTPRoute pointing at the Service above, or
+set `httpRoute.enabled: true` in values.yaml.
+{{- end }}
+
+The controller will auto-create a DashboardConfig named "default" if
+one does not exist:
+  kubectl get dashboardconfig default -o yaml
