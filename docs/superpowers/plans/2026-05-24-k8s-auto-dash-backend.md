@@ -1971,98 +1971,7 @@ make test -run TestStore_Watch
 ```
 Expected: build error, `Watch` undefined.
 
-- [ ] **Step 3: Extend `internal/config/store.go`** — add imports and append:
-
-```go
-// (add to imports)
-//   "k8s.io/apimachinery/pkg/fields"
-//   "k8s.io/client-go/rest"
-//   "k8s.io/client-go/tools/cache"
-
-// Watch returns a channel that receives the latest DashboardConfig
-// whenever it changes (including external kubectl edits). Closed when
-// ctx is cancelled.
-func (s *Store) Watch(ctx context.Context, cfg *rest.Config) (<-chan *v1.DashboardConfig, error) {
-	out := make(chan *v1.DashboardConfig, 8)
-
-	gvk := v1.GroupVersion.WithKind("DashboardConfig")
-	informer, err := cache.NewSharedIndexInformer(
-		// use a typed watcher via controller-runtime cache instead — see Note below.
-		nil, nil, 0, cache.Indexers{},
-	), error(nil)
-	_ = gvk
-	_ = informer
-
-	// Implementation: use sigs.k8s.io/controller-runtime cache.New so we
-	// get typed clients and SchemeBuilder support, started with ctx.
-	c, err := cacheNew(ctx, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	inf, err := c.GetInformer(ctx, &v1.DashboardConfig{})
-	if err != nil {
-		return nil, err
-	}
-
-	emit := func(obj any) {
-		dc, ok := obj.(*v1.DashboardConfig)
-		if !ok || dc.Name != SingletonName {
-			return
-		}
-		select {
-		case out <- dc.DeepCopy():
-		default:
-			// drop; consumer is slow. Watch is best-effort.
-		}
-	}
-	_, err = inf.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    emit,
-		UpdateFunc: func(_, n any) { emit(n) },
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	go func() {
-		<-ctx.Done()
-		close(out)
-	}()
-	return out, nil
-}
-```
-
-Add helper file `internal/config/cache.go`:
-
-```go
-package config
-
-import (
-	"context"
-
-	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
-	"k8s.io/client-go/rest"
-
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-)
-
-// cacheNew constructs a started controller-runtime cache for our CRD.
-func cacheNew(ctx context.Context, cfg *rest.Config) (ctrlcache.Cache, error) {
-	scheme := newScheme()
-	c, err := ctrlcache.New(cfg, ctrlcache.Options{Scheme: scheme})
-	if err != nil {
-		return nil, err
-	}
-	go func() { _ = c.Start(ctx) }()
-	if !c.WaitForCacheSync(ctx) {
-		// Best-effort; caller will see no events on shutdown.
-	}
-	_ = v1.GroupVersion // reference to silence unused
-	return c, nil
-}
-```
-
-And `internal/config/scheme.go`:
+- [ ] **Step 3: Create `internal/config/scheme.go`**
 
 ```go
 package config
@@ -2080,9 +1989,47 @@ func newScheme() *runtime.Scheme {
 }
 ```
 
-Then **delete the placeholder `informer, err := cache.NewSharedIndexInformer(...)` block** in `Watch` — that was scaffolding to illustrate the alternative path. The real `Watch` body is:
+- [ ] **Step 4: Create `internal/config/cache.go`**
 
 ```go
+package config
+
+import (
+	"context"
+
+	"k8s.io/client-go/rest"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
+)
+
+// cacheNew constructs and starts a controller-runtime cache scoped to
+// our CRD scheme. It blocks until the cache has synced or ctx ends.
+func cacheNew(ctx context.Context, cfg *rest.Config) (ctrlcache.Cache, error) {
+	c, err := ctrlcache.New(cfg, ctrlcache.Options{Scheme: newScheme()})
+	if err != nil {
+		return nil, err
+	}
+	go func() { _ = c.Start(ctx) }()
+	c.WaitForCacheSync(ctx)
+	return c, nil
+}
+```
+
+- [ ] **Step 5: Append `Watch` to `internal/config/store.go`**
+
+Add these imports to the existing import block in `store.go`:
+
+```go
+"k8s.io/client-go/rest"
+toolscache "k8s.io/client-go/tools/cache"
+```
+
+Append the method:
+
+```go
+// Watch returns a channel that receives the latest DashboardConfig
+// whenever it changes (including external kubectl edits). The channel
+// is closed when ctx is cancelled. Delivery is best-effort: if a
+// consumer is slow, intermediate updates are dropped.
 func (s *Store) Watch(ctx context.Context, cfg *rest.Config) (<-chan *v1.DashboardConfig, error) {
 	out := make(chan *v1.DashboardConfig, 8)
 
@@ -2105,7 +2052,7 @@ func (s *Store) Watch(ctx context.Context, cfg *rest.Config) (<-chan *v1.Dashboa
 		default:
 		}
 	}
-	if _, err = inf.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	if _, err := inf.AddEventHandler(toolscache.ResourceEventHandlerFuncs{
 		AddFunc:    emit,
 		UpdateFunc: func(_, n any) { emit(n) },
 	}); err != nil {
@@ -2120,31 +2067,14 @@ func (s *Store) Watch(ctx context.Context, cfg *rest.Config) (<-chan *v1.Dashboa
 }
 ```
 
-Required imports for the final `store.go`:
-
-```go
-import (
-	"context"
-	"errors"
-
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-)
-```
-
-- [ ] **Step 4: Run, see pass**
+- [ ] **Step 6: Run, see pass**
 
 ```bash
 make test
 ```
 Expected: `PASS`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add internal/config/
