@@ -14,14 +14,14 @@ Auto-discovering homelab dashboard for Kubernetes Gateway API.
 ### Helm
 
 ```bash
-helm install k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
+helm install k8s-auto-dash oci://ghcr.io/tekulvw/charts/k8s-auto-dash \
   --namespace k8s-auto-dash --create-namespace
 ```
 
 Then publish the dashboard onto your own gateway:
 
 ```bash
-helm upgrade k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
+helm upgrade k8s-auto-dash oci://ghcr.io/tekulvw/charts/k8s-auto-dash \
   --reuse-values \
   --set httpRoute.enabled=true \
   --set httpRoute.hostname=dash.example.com \
@@ -32,7 +32,7 @@ helm upgrade k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
 ### kubectl
 
 ```bash
-kubectl apply -f https://github.com/anomalyco/k8s-auto-dash/releases/latest/download/install.yaml
+kubectl apply -f https://github.com/tekulvw/k8s-auto-dash/releases/latest/download/install.yaml
 ```
 
 This creates a Namespace `k8s-auto-dash`, the CRD, RBAC, Deployment,

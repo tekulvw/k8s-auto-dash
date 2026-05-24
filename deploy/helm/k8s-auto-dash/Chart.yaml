@@ -4,9 +4,9 @@ description: Auto-discovering dashboard for Kubernetes Gateway API HTTPRoutes
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
-home: https://github.com/anomalyco/k8s-auto-dash
+home: https://github.com/tekulvw/k8s-auto-dash
 sources:
-  - https://github.com/anomalyco/k8s-auto-dash
+  - https://github.com/tekulvw/k8s-auto-dash
 keywords:
   - dashboard
   - gateway-api

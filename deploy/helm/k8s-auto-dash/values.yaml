@@ -1,7 +1,7 @@
 # Default values for k8s-auto-dash.
 
 image:
-  repository: ghcr.io/anomalyco/k8s-auto-dash
+  repository: ghcr.io/tekulvw/k8s-auto-dash
   tag: ""                       # defaults to .Chart.AppVersion
   pullPolicy: IfNotPresent
 

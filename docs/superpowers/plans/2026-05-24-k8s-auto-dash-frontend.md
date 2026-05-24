@@ -2439,7 +2439,7 @@ Note ordering — the API routes are registered with method-prefixed patterns
 `http.ServeMux`. Import:
 
 ```go
-"github.com/anomalyco/k8s-auto-dash/internal/assets"
+"github.com/tekulvw/k8s-auto-dash/internal/assets"
 ```
 
 - [ ] **Step 5: Update Makefile**

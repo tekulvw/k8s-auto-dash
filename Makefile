@@ -38,7 +38,7 @@ build:
 tidy:
 	$(GO) mod tidy
 
-IMAGE         ?= ghcr.io/anomalyco/k8s-auto-dash
+IMAGE         ?= ghcr.io/tekulvw/k8s-auto-dash
 TAG           ?= dev
 PLATFORMS     ?= linux/amd64,linux/arm64
 

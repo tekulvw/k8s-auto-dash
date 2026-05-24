@@ -173,7 +173,7 @@ git commit -m "feat: multi-stage Dockerfile (Node UI + Go binary + distroless)"
 Append to `Makefile`:
 
 ```make
-IMAGE         ?= ghcr.io/anomalyco/k8s-auto-dash
+IMAGE         ?= ghcr.io/tekulvw/k8s-auto-dash
 TAG           ?= dev
 PLATFORMS     ?= linux/amd64,linux/arm64
 ICONS_COMMIT  ?= main
@@ -234,9 +234,9 @@ description: Auto-discovering dashboard for Kubernetes Gateway API HTTPRoutes
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
-home: https://github.com/anomalyco/k8s-auto-dash
+home: https://github.com/tekulvw/k8s-auto-dash
 sources:
-  - https://github.com/anomalyco/k8s-auto-dash
+  - https://github.com/tekulvw/k8s-auto-dash
 keywords:
   - dashboard
   - gateway-api
@@ -250,7 +250,7 @@ kubeVersion: ">=1.27.0-0"
 # Default values for k8s-auto-dash.
 
 image:
-  repository: ghcr.io/anomalyco/k8s-auto-dash
+  repository: ghcr.io/tekulvw/k8s-auto-dash
   tag: ""                       # defaults to .Chart.AppVersion
   pullPolicy: IfNotPresent
 
@@ -1079,14 +1079,14 @@ Auto-discovering homelab dashboard for Kubernetes Gateway API.
 ### Helm
 
 ```bash
-helm install k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
+helm install k8s-auto-dash oci://ghcr.io/tekulvw/charts/k8s-auto-dash \
   --namespace k8s-auto-dash --create-namespace
 ```
 
 Then publish the dashboard onto your own gateway:
 
 ```bash
-helm upgrade k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
+helm upgrade k8s-auto-dash oci://ghcr.io/tekulvw/charts/k8s-auto-dash \
   --reuse-values \
   --set httpRoute.enabled=true \
   --set httpRoute.hostname=dash.example.com \
@@ -1097,7 +1097,7 @@ helm upgrade k8s-auto-dash oci://ghcr.io/anomalyco/charts/k8s-auto-dash \
 ### kubectl
 
 ```bash
-kubectl apply -f https://github.com/anomalyco/k8s-auto-dash/releases/latest/download/install.yaml
+kubectl apply -f https://github.com/tekulvw/k8s-auto-dash/releases/latest/download/install.yaml
 ```
 
 This creates a Namespace `k8s-auto-dash`, the CRD, RBAC, Deployment,
@@ -1179,7 +1179,7 @@ git commit -m "docs: README with quick-start"
   switch to `RollingUpdate` without first adding leader election to
   the backend — the controller assumes exclusive write access to its
   CR.
-- **Repository owner placeholder:** `ghcr.io/anomalyco/...` appears in
+- **Repository owner placeholder:** `ghcr.io/tekulvw/...` appears in
   several files. If publishing under a different org, do a single
   search-and-replace before tagging.
 - **`ICONS_COMMIT`:** every build path (Makefile, Dockerfile, CI,

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Convert Makefile → justfile, rename repo from `anomalyco` → `tekulvw` everywhere, update all dependencies to latest compatible versions, and fix the linux/amd64 local build failure caused by QEMU memory corruption when emulating x86_64 on Apple Silicon.
+**Goal:** Convert Makefile → justfile, rename repo from `tekulvw` → `tekulvw` everywhere, update all dependencies to latest compatible versions, and fix the linux/amd64 local build failure caused by QEMU memory corruption when emulating x86_64 on Apple Silicon.
 
 **Architecture:** Four independent areas of change applied sequentially: (1) Go module rename via `go mod edit` + sed-style replacement across all `.go` files, (2) Makefile → justfile conversion, (3) dependency version bumps in `go.mod`, `package.json`, `Dockerfile`, and CI workflows, (4) local image target restricted to native arch only. All changes verified with the existing test suite (`make test` / `go test ./...`) and a local image build.
 
@@ -21,10 +21,10 @@
 | `Dockerfile` | No version changes needed (node:22, golang:1.26 are current) |
 | `.github/workflows/ci.yaml` | pnpm version 9→11, helm v3.14.0→v4.2.0 |
 | `.github/workflows/release.yaml` | No org references (uses `${{ github.repository }}`) |
-| `deploy/helm/k8s-auto-dash/Chart.yaml` | `anomalyco` → `tekulvw` in home/sources |
+| `deploy/helm/k8s-auto-dash/Chart.yaml` | `tekulvw` → `tekulvw` in home/sources |
 | `deploy/helm/k8s-auto-dash/values.yaml` | image.repository org rename |
 | `deploy/manifests/install.yaml` | image reference org rename |
-| `README.md` | All `anomalyco` refs → `tekulvw` |
+| `README.md` | All `tekulvw` refs → `tekulvw` |
 | `docs/superpowers/plans/*.md` | Historical plan docs — org rename |
 
 ---
@@ -45,7 +45,7 @@ go mod edit -module github.com/tekulvw/k8s-auto-dash
 
 ```bash
 find . -name '*.go' -not -path './.git/*' \
-  | xargs sed -i '' 's|github.com/anomalyco/k8s-auto-dash|github.com/tekulvw/k8s-auto-dash|g'
+  | xargs sed -i '' 's|github.com/tekulvw/k8s-auto-dash|github.com/tekulvw/k8s-auto-dash|g'
 ```
 
 - [ ] **Step 3: Verify the module line in go.mod is correct**
@@ -61,10 +61,10 @@ module github.com/tekulvw/k8s-auto-dash
 go 1.26.2
 ```
 
-- [ ] **Step 4: Verify no anomalyco import paths remain in Go files**
+- [ ] **Step 4: Verify no tekulvw import paths remain in Go files**
 
 ```bash
-grep -r "github.com/anomalyco" --include="*.go" .
+grep -r "github.com/tekulvw" --include="*.go" .
 ```
 
 Expected: no output.
@@ -97,7 +97,7 @@ git commit -m "refactor: rename module to github.com/tekulvw/k8s-auto-dash"
 - Modify: `docs/superpowers/plans/2026-05-24-k8s-auto-dash-packaging.md`
 - Modify: `docs/superpowers/plans/2026-05-24-k8s-auto-dash-frontend.md`
 
-- [ ] **Step 1: Replace anomalyco in helm chart**
+- [ ] **Step 1: Replace tekulvw in helm chart**
 
 Edit `deploy/helm/k8s-auto-dash/Chart.yaml`:
 ```yaml
@@ -111,38 +111,38 @@ Edit `deploy/helm/k8s-auto-dash/values.yaml` line 4:
   repository: ghcr.io/tekulvw/k8s-auto-dash
 ```
 
-- [ ] **Step 2: Replace anomalyco in install.yaml**
+- [ ] **Step 2: Replace tekulvw in install.yaml**
 
 ```bash
-sed -i '' 's|ghcr.io/anomalyco/k8s-auto-dash|ghcr.io/tekulvw/k8s-auto-dash|g' \
+sed -i '' 's|ghcr.io/tekulvw/k8s-auto-dash|ghcr.io/tekulvw/k8s-auto-dash|g' \
   deploy/manifests/install.yaml
 ```
 
-- [ ] **Step 3: Replace anomalyco in README.md**
+- [ ] **Step 3: Replace tekulvw in README.md**
 
 ```bash
-sed -i '' 's|anomalyco|tekulvw|g' README.md
+sed -i '' 's|tekulvw|tekulvw|g' README.md
 ```
 
 Verify:
 ```bash
-grep "anomalyco" README.md
+grep "tekulvw" README.md
 ```
 Expected: no output.
 
-- [ ] **Step 4: Replace anomalyco in historical plan docs**
+- [ ] **Step 4: Replace tekulvw in historical plan docs**
 
 ```bash
-sed -i '' 's|anomalyco|tekulvw|g' \
+sed -i '' 's|tekulvw|tekulvw|g' \
   docs/superpowers/plans/2026-05-24-k8s-auto-dash-backend.md \
   docs/superpowers/plans/2026-05-24-k8s-auto-dash-packaging.md \
   docs/superpowers/plans/2026-05-24-k8s-auto-dash-frontend.md
 ```
 
-- [ ] **Step 5: Confirm no anomalyco references remain anywhere (excluding .git)**
+- [ ] **Step 5: Confirm no tekulvw references remain anywhere (excluding .git)**
 
 ```bash
-grep -r "anomalyco" \
+grep -r "tekulvw" \
   --include="*.go" --include="*.yaml" --include="*.yml" \
   --include="*.json" --include="*.md" --include="Makefile" \
   --include="Dockerfile" --include="*.ts" --include="*.js" \
@@ -164,7 +164,7 @@ Expected: `1 chart(s) linted, 0 chart(s) failed`
 
 ```bash
 git add -A
-git commit -m "refactor: rename org anomalyco → tekulvw in all non-Go files"
+git commit -m "refactor: rename org tekulvw → tekulvw in all non-Go files"
 ```
 
 ---
@@ -593,10 +593,10 @@ git commit -m "fix: local image target builds native arch only (avoids QEMU/amd6
 
 ## Task 8: Final verification
 
-- [ ] **Step 1: Confirm zero anomalyco references remain in tracked files**
+- [ ] **Step 1: Confirm zero tekulvw references remain in tracked files**
 
 ```bash
-git grep "anomalyco" -- '*.go' '*.yaml' '*.yml' '*.md' '*.json' 'Dockerfile' 'justfile'
+git grep "tekulvw" -- '*.go' '*.yaml' '*.yml' '*.md' '*.json' 'Dockerfile' 'justfile'
 ```
 
 Expected: no output.

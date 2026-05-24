@@ -84,7 +84,7 @@
 - [ ] **Step 1: Init module**
 
 ```bash
-go mod init github.com/anomalyco/k8s-auto-dash
+go mod init github.com/tekulvw/k8s-auto-dash
 ```
 
 - [ ] **Step 2: Add base dependencies**
@@ -814,7 +814,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 func TestApplyOverrides_FieldsWin(t *testing.T) {
@@ -892,7 +892,7 @@ package tile
 import (
 	"sort"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 // ApplyOverrides returns a copy of derived with overrides applied.
@@ -1006,7 +1006,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func TestClassify(t *testing.T) {
@@ -1044,7 +1044,7 @@ Expected: build errors, `Classify` undefined.
 ```go
 package health
 
-import "github.com/anomalyco/k8s-auto-dash/internal/tile"
+import "github.com/tekulvw/k8s-auto-dash/internal/tile"
 
 // Classify maps an HTTP response (or network error) to a tile state.
 //   error != nil       -> down
@@ -1094,7 +1094,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func TestProbe_HEAD200(t *testing.T) {
@@ -1181,7 +1181,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type ProbeOptions struct {
@@ -1304,7 +1304,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type recorder struct {
@@ -1434,7 +1434,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type Target struct {
@@ -1604,7 +1604,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 type Env struct {
@@ -1675,7 +1675,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestStore_BootstrapCreatesDefault(t *testing.T) {
@@ -1727,7 +1727,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 // SingletonName is the only DashboardConfig the controller reads.
@@ -1804,8 +1804,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestStore_MutateSpec(t *testing.T) {
@@ -1932,8 +1932,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestStore_WatchEmitsOnChange(t *testing.T) {
@@ -1979,7 +1979,7 @@ package config
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 func newScheme() *runtime.Scheme {
@@ -2108,7 +2108,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestDiscoverer_EmitsTilesAfterRouteCreation(t *testing.T) {
@@ -2206,7 +2206,7 @@ import (
 	toolscache "k8s.io/client-go/tools/cache"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 type Options struct {
@@ -2373,8 +2373,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func TestState_MergedView(t *testing.T) {
@@ -2426,8 +2426,8 @@ import (
 	"sort"
 	"sync"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 // ViewTile is the wire shape returned from /api/tiles. It mirrors
@@ -2587,7 +2587,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func TestHandleTiles_ReturnsJSON(t *testing.T) {
@@ -2644,7 +2644,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 // fakeMutator implements ConfigMutator for handler tests.
@@ -2753,7 +2753,7 @@ import (
 	"context"
 	"net/http"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 // ConfigMutator is the narrow interface the API needs from config.Store.
@@ -2803,7 +2803,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
 )
 
 func (s *Server) requireMutator(w http.ResponseWriter) bool {
@@ -3304,7 +3304,7 @@ s.mux.Handle("GET /metrics",
     promhttp.HandlerFor(m.metrics.Registry, promhttp.HandlerOpts{}))
 ```
 
-Import `"github.com/prometheus/client_golang/prometheus/promhttp"` and `metrics "github.com/anomalyco/k8s-auto-dash/internal/metrics"`.
+Import `"github.com/prometheus/client_golang/prometheus/promhttp"` and `metrics "github.com/tekulvw/k8s-auto-dash/internal/metrics"`.
 
 - [ ] **Step 5: Run, see pass**
 
@@ -3344,13 +3344,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	v1 "github.com/anomalyco/k8s-auto-dash/api/v1alpha1"
-	"github.com/anomalyco/k8s-auto-dash/internal/api"
-	configstore "github.com/anomalyco/k8s-auto-dash/internal/config"
-	"github.com/anomalyco/k8s-auto-dash/internal/discovery"
-	"github.com/anomalyco/k8s-auto-dash/internal/health"
-	"github.com/anomalyco/k8s-auto-dash/internal/metrics"
-	"github.com/anomalyco/k8s-auto-dash/internal/tile"
+	v1 "github.com/tekulvw/k8s-auto-dash/api/v1alpha1"
+	"github.com/tekulvw/k8s-auto-dash/internal/api"
+	configstore "github.com/tekulvw/k8s-auto-dash/internal/config"
+	"github.com/tekulvw/k8s-auto-dash/internal/discovery"
+	"github.com/tekulvw/k8s-auto-dash/internal/health"
+	"github.com/tekulvw/k8s-auto-dash/internal/metrics"
+	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
 func main() {
@@ -3544,10 +3544,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	"github.com/anomalyco/k8s-auto-dash/internal/api"
-	configstore "github.com/anomalyco/k8s-auto-dash/internal/config"
-	"github.com/anomalyco/k8s-auto-dash/internal/discovery"
-	"github.com/anomalyco/k8s-auto-dash/internal/testenv"
+	"github.com/tekulvw/k8s-auto-dash/internal/api"
+	configstore "github.com/tekulvw/k8s-auto-dash/internal/config"
+	"github.com/tekulvw/k8s-auto-dash/internal/discovery"
+	"github.com/tekulvw/k8s-auto-dash/internal/testenv"
 )
 
 func TestE2E_DiscoveryToAPI(t *testing.T) {
