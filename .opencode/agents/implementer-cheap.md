@@ -1,7 +1,7 @@
 ---
 description: Executes a single low-risk task from an implementation plan. Uses DeepSeek V4 Flash via OpenCode Zen. Route pure-logic TDD, Svelte components, Helm templates, and Dockerfile tasks here.
 mode: subagent
-model: opencode/deepseek-v4-flash
+model: opencode/deepseek-v4-flash-free
 temperature: 0.1
 permission:
   edit: allow
