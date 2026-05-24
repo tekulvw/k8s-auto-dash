@@ -1,4 +1,5 @@
 .superpowers/
+.worktrees/
 bin/
 /k8s-auto-dash
 *.test
