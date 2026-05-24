@@ -88,6 +88,12 @@ jobs:
     needs: [merge]
     steps:
       - uses: actions/checkout@v6
+      - name: Set chart version
+        run: |
+          BARE="${{ github.ref_name }}"
+          BARE="${BARE#v}"
+          sed -i "s/^version:.*/version: ${BARE}/" deploy/helm/k8s-auto-dash/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${BARE}\"/" deploy/helm/k8s-auto-dash/Chart.yaml
       - uses: azure/setup-helm@v5
         with: { version: 'v4.2.0' }
       - uses: actions/setup-go@v6
