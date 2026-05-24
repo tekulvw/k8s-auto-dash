@@ -1,7 +1,7 @@
 ---
 description: Executes a single high-risk task from an implementation plan. Uses Sonnet 4.6. Route concurrency, k8s informer, SSE, envtest, and main-wiring tasks here.
 mode: subagent
-model: anthropic/claude-sonnet-4-6
+model: opencode/claude-sonnet-4-6
 temperature: 0.1
 permission:
   edit: allow
