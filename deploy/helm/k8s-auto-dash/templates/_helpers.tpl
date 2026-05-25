@@ -40,5 +40,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "k8s-auto-dash.image" -}}
 {{- $tag := default .Chart.AppVersion .Values.image.tag -}}
+{{- if not (hasPrefix "v" $tag) -}}{{- $tag = printf "v%s" $tag -}}{{- end -}}
 {{- printf "%s:%s" .Values.image.repository $tag -}}
 {{- end -}}
