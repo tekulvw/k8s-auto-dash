@@ -52,6 +52,11 @@ type Tile struct {
 	InsecureSkipVerify bool     `json:"insecureSkipVerify,omitempty"`
 	Status             Status   `json:"status"`
 	K8s                *K8sInfo `json:"k8s,omitempty"`
+	// HealthCheckURL is the internal URL used for health probing. When set it
+	// takes precedence over URL so that cluster-internal addresses are used
+	// instead of externally-routed hostnames (e.g. Tailscale/headscale names).
+	// It is intentionally excluded from the JSON API response.
+	HealthCheckURL string `json:"-"`
 }
 
 type Group struct {

@@ -155,8 +155,12 @@ func targetsFromState(s *api.State) []health.Target {
 		if t.URL == "" {
 			continue
 		}
+		probeURL := t.URL
+		if t.HealthCheckURL != "" {
+			probeURL = t.HealthCheckURL
+		}
 		out = append(out, health.Target{
-			ID: t.ID, URL: t.URL, InsecureSkipVerify: t.InsecureSkipVerify,
+			ID: t.ID, URL: probeURL, InsecureSkipVerify: t.InsecureSkipVerify,
 		})
 	}
 	return out

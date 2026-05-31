@@ -26,6 +26,50 @@ func newRoute(ns, name string, hosts []string, parents []gwv1.ParentReference) *
 	}
 }
 
+func withServiceBackend(r *gwv1.HTTPRoute, svcName string, port int) *gwv1.HTTPRoute {
+	r.Spec.Rules = []gwv1.HTTPRouteRule{{
+		BackendRefs: []gwv1.HTTPBackendRef{{
+			BackendRef: gwv1.BackendRef{
+				BackendObjectReference: gwv1.BackendObjectReference{
+					Name: gwv1.ObjectName(svcName),
+					Port: ptr(gwv1.PortNumber(port)),
+				},
+			},
+		}},
+	}}
+	return r
+}
+
+func withServiceBackendInNS(r *gwv1.HTTPRoute, svcName, ns string, port int) *gwv1.HTTPRoute {
+	r.Spec.Rules = []gwv1.HTTPRouteRule{{
+		BackendRefs: []gwv1.HTTPBackendRef{{
+			BackendRef: gwv1.BackendRef{
+				BackendObjectReference: gwv1.BackendObjectReference{
+					Name:      gwv1.ObjectName(svcName),
+					Namespace: ptr(gwv1.Namespace(ns)),
+					Port:      ptr(gwv1.PortNumber(port)),
+				},
+			},
+		}},
+	}}
+	return r
+}
+
+func withBackendRef(r *gwv1.HTTPRoute, backendName string, port int) *gwv1.HTTPRoute {
+	r.Spec.Rules = []gwv1.HTTPRouteRule{{
+		BackendRefs: []gwv1.HTTPBackendRef{{
+			BackendRef: gwv1.BackendRef{
+				BackendObjectReference: gwv1.BackendObjectReference{
+					Kind: ptr(gwv1.Kind("Backend")),
+					Name: gwv1.ObjectName(backendName),
+					Port: ptr(gwv1.PortNumber(port)),
+				},
+			},
+		}},
+	}}
+	return r
+}
+
 func parent(ns, name string) gwv1.ParentReference {
 	return gwv1.ParentReference{
 		Namespace: (*gwv1.Namespace)(ptr(gwv1.Namespace(ns))),
@@ -41,7 +85,7 @@ func TestDerive_BasicSingleHost(t *testing.T) {
 	}
 	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
 
-	got := Derive(routes, gateways)
+	got := Derive(routes, gateways, nil)
 
 	assert.Len(t, got, 1)
 	assert.Equal(t, "media/jellyfin/jellyfin.example.com", got[0].ID)
@@ -65,7 +109,7 @@ func TestDerive_MultipleHostsProduceMultipleTiles(t *testing.T) {
 	}
 	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
 
-	got := Derive(routes, gateways)
+	got := Derive(routes, gateways, nil)
 
 	assert.Len(t, got, 2)
 }
@@ -77,7 +121,7 @@ func TestDerive_WildcardHostnameSkipped(t *testing.T) {
 	}
 	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
 
-	got := Derive(routes, gateways)
+	got := Derive(routes, gateways, nil)
 	assert.Empty(t, got)
 }
 
@@ -86,7 +130,7 @@ func TestDerive_EmptyHostnameSkipped(t *testing.T) {
 		newRoute("media", "x", []string{""},
 			[]gwv1.ParentReference{parent("gateway", "ext")}),
 	}
-	got := Derive(routes, map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true})
+	got := Derive(routes, map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}, nil)
 	assert.Empty(t, got)
 }
 
@@ -95,7 +139,7 @@ func TestDerive_UnresolvedParentRefSkipped(t *testing.T) {
 		newRoute("media", "x", []string{"a.example.com"},
 			[]gwv1.ParentReference{parent("gateway", "missing")}),
 	}
-	got := Derive(routes, map[GatewayKey]bool{})
+	got := Derive(routes, map[GatewayKey]bool{}, nil)
 	assert.Empty(t, got)
 }
 
@@ -104,7 +148,7 @@ func TestDerive_ParentRefWithoutNamespaceUsesRouteNamespace(t *testing.T) {
 	r.Spec.ParentRefs = []gwv1.ParentReference{{Name: gwv1.ObjectName("ext")}}
 	gateways := map[GatewayKey]bool{{Namespace: "media", Name: "ext"}: true}
 
-	got := Derive([]*gwv1.HTTPRoute{r}, gateways)
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, nil)
 	assert.Len(t, got, 1)
 	assert.Equal(t, []GatewayRef{{Namespace: "media", Name: "ext"}},
 		got[0].K8s.GatewayRefs)
@@ -119,8 +163,79 @@ func TestDerive_Deterministic(t *testing.T) {
 	}
 	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
 
-	a := Derive(routes, gateways)
-	b := Derive(routes, gateways)
+	a := Derive(routes, gateways, nil)
+	b := Derive(routes, gateways, nil)
 	assert.Equal(t, a, b)
 	assert.Equal(t, "a/y/y.example.com", a[0].ID, "sorted by id ascending")
+}
+
+func TestDerive_ServiceBackendSetsHealthCheckURL(t *testing.T) {
+	r := withServiceBackend(
+		newRoute("media", "jellyfin", []string{"jellyfin.vpn.example.com"},
+			[]gwv1.ParentReference{parent("gateway", "ext")}),
+		"jellyfin", 8096,
+	)
+	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
+
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, nil)
+
+	assert.Len(t, got, 1)
+	assert.Equal(t, "http://jellyfin.media.svc.cluster.local:8096", got[0].HealthCheckURL)
+	assert.Equal(t, "https://jellyfin.vpn.example.com", got[0].URL, "display URL unchanged")
+}
+
+func TestDerive_ServiceBackendCrossNamespace(t *testing.T) {
+	r := withServiceBackendInNS(
+		newRoute("gateway", "ha", []string{"home.vpn.example.com"},
+			[]gwv1.ParentReference{parent("gateway", "ext")}),
+		"home-assistant", "homeassistant", 8123,
+	)
+	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
+
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, nil)
+
+	assert.Len(t, got, 1)
+	assert.Equal(t, "http://home-assistant.homeassistant.svc.cluster.local:8123", got[0].HealthCheckURL)
+}
+
+func TestDerive_BackendRefResolvesToIPEndpoint(t *testing.T) {
+	r := withBackendRef(
+		newRoute("nas", "nas-console", []string{"nas.vpn.example.com"},
+			[]gwv1.ParentReference{parent("gateway", "ext")}),
+		"nas-console", 9001,
+	)
+	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
+	backends := BackendMap{
+		"nas/nas-console": {Address: "192.168.1.204", Port: 5000},
+	}
+
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, backends)
+
+	assert.Len(t, got, 1)
+	assert.Equal(t, "http://192.168.1.204:5000", got[0].HealthCheckURL)
+}
+
+func TestDerive_BackendRefMissingFromMapLeavesHealthCheckURLEmpty(t *testing.T) {
+	r := withBackendRef(
+		newRoute("nas", "nas-console", []string{"nas.vpn.example.com"},
+			[]gwv1.ParentReference{parent("gateway", "ext")}),
+		"nas-console", 9001,
+	)
+	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
+
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, BackendMap{})
+
+	assert.Len(t, got, 1)
+	assert.Empty(t, got[0].HealthCheckURL)
+}
+
+func TestDerive_NoBackendRefsLeavesHealthCheckURLEmpty(t *testing.T) {
+	r := newRoute("media", "x", []string{"x.example.com"},
+		[]gwv1.ParentReference{parent("gateway", "ext")})
+	gateways := map[GatewayKey]bool{{Namespace: "gateway", Name: "ext"}: true}
+
+	got := Derive([]*gwv1.HTTPRoute{r}, gateways, nil)
+
+	assert.Len(t, got, 1)
+	assert.Empty(t, got[0].HealthCheckURL)
 }

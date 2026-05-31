@@ -7,7 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	toolscache "k8s.io/client-go/tools/cache"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -17,6 +19,12 @@ import (
 	"github.com/tekulvw/k8s-auto-dash/internal/tile"
 )
 
+var backendGVR = schema.GroupVersionResource{
+	Group:    "gateway.envoyproxy.io",
+	Version:  "v1alpha1",
+	Resource: "backends",
+}
+
 type Options struct {
 	Debounce time.Duration // default 250ms
 }
@@ -25,6 +33,7 @@ type Discoverer struct {
 	cfg     *rest.Config
 	opts    Options
 	cache   cache.Cache
+	client  client.Client
 	scheme  *runtime.Scheme
 	out     chan []tile.Tile
 	dirty   chan struct{}
@@ -43,10 +52,18 @@ func New(cfg *rest.Config, opts Options) (*Discoverer, error) {
 	if err != nil {
 		return nil, err
 	}
+	// A non-caching client is used only for fetching Backend resources
+	// (gateway.envoyproxy.io/v1alpha1), which are not registered in the
+	// scheme and are fetched as unstructured on each compute.
+	cl, err := client.New(cfg, client.Options{})
+	if err != nil {
+		return nil, err
+	}
 	return &Discoverer{
 		cfg:    cfg,
 		opts:   opts,
 		cache:  c,
+		client: cl,
 		scheme: s,
 		out:    make(chan []tile.Tile, 4),
 		dirty:  make(chan struct{}, 1),
@@ -139,7 +156,60 @@ func (d *Discoverer) compute(ctx context.Context) ([]tile.Tile, error) {
 	for i := range hrs.Items {
 		routes[i] = &hrs.Items[i]
 	}
-	return tile.Derive(routes, gwSet), nil
+
+	backends := d.fetchBackends(ctx)
+	return tile.Derive(routes, gwSet, backends), nil
+}
+
+// fetchBackends lists all Envoy Gateway Backend resources across namespaces
+// and builds a BackendMap keyed by "namespace/name". Errors are logged and
+// a best-effort (possibly empty) map is returned so tile derivation can
+// still proceed.
+func (d *Discoverer) fetchBackends(ctx context.Context) tile.BackendMap {
+	var list unstructured.UnstructuredList
+	list.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   backendGVR.Group,
+		Version: backendGVR.Version,
+		Kind:    "BackendList",
+	})
+	if err := d.client.List(ctx, &list); err != nil {
+		// Backend CRD may not be installed; treat as empty rather than fatal.
+		return nil
+	}
+
+	result := make(tile.BackendMap, len(list.Items))
+	for _, item := range list.Items {
+		ep, ok := extractFirstIPEndpoint(item)
+		if !ok {
+			continue
+		}
+		key := item.GetNamespace() + "/" + item.GetName()
+		result[key] = ep
+	}
+	return result
+}
+
+// extractFirstIPEndpoint pulls the first spec.endpoints[].ip endpoint out of
+// an unstructured Backend object.
+func extractFirstIPEndpoint(obj unstructured.Unstructured) (tile.BackendEndpoint, bool) {
+	endpoints, ok, _ := unstructured.NestedSlice(obj.Object, "spec", "endpoints")
+	if !ok || len(endpoints) == 0 {
+		return tile.BackendEndpoint{}, false
+	}
+	ep, ok := endpoints[0].(map[string]any)
+	if !ok {
+		return tile.BackendEndpoint{}, false
+	}
+	ip, ok := ep["ip"].(map[string]any)
+	if !ok {
+		return tile.BackendEndpoint{}, false
+	}
+	address, _, _ := unstructured.NestedString(ip, "address")
+	port, _, _ := unstructured.NestedInt64(ip, "port")
+	if address == "" || port == 0 {
+		return tile.BackendEndpoint{}, false
+	}
+	return tile.BackendEndpoint{Address: address, Port: int32(port)}, true
 }
 
 // (compile-time guard: client.Object referenced)
